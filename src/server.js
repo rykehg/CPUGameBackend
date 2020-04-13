@@ -1,5 +1,5 @@
-const app = require('./app')
-const dotenv = require('dotenv')
+require('dotenv').config()
 
-dotenv.config()
+const app = require('./app')
+
 app.listen(process.event.PORT || 3333);
