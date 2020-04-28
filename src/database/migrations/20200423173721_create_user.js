@@ -1,17 +1,15 @@
 
 exports.up = function(knex) {
-    return knex.schema.createTable('users', function (table){
-        table.increments('cd_User');
-        table.string('nm_Login', 30);
-        table.string('nm_Email', 40);
-        table.string('nm_Type', 9);
-        table.string('nm_Password', 20);
-        table.timestamp('dt_Register').defaultTo(knex.fn.now());
-
-    });
-    
+  return knex.schema.createTable('users', function (table){
+    table.increments('cd_User');
+    table.string('nm_Login', 30);
+    table.string('nm_Email', 40);
+    table.string('nm_Type', 9);
+    table.string('nm_Password', 20);
+    table.timestamp('dt_Register').defaultTo(knex.fn.now());
+  });
 };
 
 exports.down = function(knex) {
-    return knex.schema.dropTable('users');
+  return knex.schema.dropTable('users');
 };
