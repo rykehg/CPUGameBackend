@@ -7,5 +7,6 @@
  // Routes
  routes.post('/auth/register', UserController.create);
  routes.delete('/auth/delete_account', UserController.delete);
+ routes.post('/auth/reset_password',UserController.reset);
 
  module.exports = routes;
