@@ -4,7 +4,15 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const mailer = require('../../../modules/mailer.js');
 
+function generateToken(params = {}){
+  return jwt.sign(params, authConfig.secret, {
+      expiresIn: 86400,
+  });
+}
+
 module.exports = {
+  
+
   async create(request, response) {
     const { login, email, type, name /*,password */ } = request.body;
 
@@ -31,8 +39,6 @@ module.exports = {
         dt_Expire: now
       });
 
-      //const hashedPassword = await bcrypt.hash(password, 10);
-
 
 
       //update
@@ -58,7 +64,7 @@ module.exports = {
 
       user.nm_Password = undefined;
  
-      return response.json({ user });
+      return response.json({ user, token: generateToken({nm_Email: user.nm_Email})});
 
     } catch (error) {
       console.log(error);
@@ -67,8 +73,9 @@ module.exports = {
   },
 
   async reset(request, response) {
-    const { email, token } = req.body;
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const { email, token } = request.body;
+    
+    const hashedPassword = await bcrypt.hash(request.body.token, 10);
 
     try {
 
@@ -77,18 +84,18 @@ module.exports = {
 
 
       if (user == null)
-        return res.status(400).json('Cannot find user.');
+        return response.status(400).json('Cannot find user.');
 
       if (token !== user.nm_Password)
-        return res.status(400).json({ error: 'Token invalid' });
+        return response.status(400).json({ error: 'Token invalid' });
 
       const now = new Date();
 
       if (now > user.dt_Expire)
-        return res.status(400).json({ error: 'Token expired, generate a new one.' });
+        return response.status(400).json({ error: 'Token expired, generate a new one.' });
 
       if (hashedPassword == user.nm_Password)
-        return res.status(400).json({ error: 'Same Password!! Sorry :/' });
+        return response.status(400).json({ error: 'Same Password!! Sorry :/' });
 
       await connection('users').update({
 
@@ -98,9 +105,9 @@ module.exports = {
 
 
 
-      res.send();
+      response.send();
     } catch (err) {
-      res.status(400).json({ error: 'Cannot reset password, try again.' });
+      response.status(400).json({ error: 'Cannot reset password, try again.' });
     }
 
   },
