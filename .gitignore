@@ -1,7 +1,8 @@
 node_modules
-!node_modules\express-handlebars\lib\express-handlebars.js
+!node_module/sexpress-handlebars/lib/express-handlebars.js
 #CONFIGURAR VARIAVEIS DE AMBIENTE NO .ENV
-config\mail.json
-config\auth.json
+config/mail.json
+config/auth.json
 .env
+Readme.txt
 
