@@ -72,7 +72,7 @@ module.exports = {
       if (user == null)
         return response.status(400).json('Cannot find user.');
 
-      if (token !== user.cd_Token)
+      if (!await bcrypt.compare(token, user.cd_Token))
         return response.status(400).json({ error: 'Token invalid' });
 
       const now = new Date();
@@ -110,9 +110,9 @@ module.exports = {
       if(!user)
         return response.status(400).json({ error: 'User not found!' });
   
-      const Token = crypto.randomBytes(20).toString('hex');
+      const token = crypto.randomBytes(20).toString('hex');
   
-      const hashedToken = await bcrypt.hash(Token, 10);
+      const hashedToken = await bcrypt.hash(token, 10);
   
       const now = new Date();
       now.setMinutes(now.getMinutes() + 10);
@@ -128,7 +128,7 @@ module.exports = {
         to: email,
         from: 'email@no-reply.com.br',
         template: 'auth/forgot_password',
-        context: { Token: Token },
+        context: { token },
       }, (err) => {
         if(err)
           return response.status(400).json({ error: 'Cannot send forgot password email.' });
@@ -141,7 +141,7 @@ module.exports = {
     }
   },
 
-  async reset (request, response) {
+  async resetPassword (request, response) {
     const { email, token, password } = request.body;
     
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -152,15 +152,15 @@ module.exports = {
       if (user == null)
         return response.status(400).json('Cannot find user.');
 
-      if (token !== user.nm_Password)
-        return response.status(400).json({ error: 'Token invalid' });
+      if (!await bcrypt.compare(token, user.cd_Token))
+        return response.status(400).json({ error: 'Token invalid.' });
 
       const now = new Date();
 
       if (now > user.dt_Expire)
         return response.status(400).json({ error: 'Token expired, generate a new one.' });
 
-      if (hashedPassword == user.nm_Password)
+      if (await bcrypt.compare(password, user.nm_Password))
         return response.status(400).json({ error: 'Same Password!!' });
 
       await connection('users').update({
@@ -171,7 +171,6 @@ module.exports = {
     } catch (err) {
       response.status(400).json({ error: 'Cannot reset password, try again.' });
     }
-
   },
 
   async delete(request, response) {

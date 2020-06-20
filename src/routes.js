@@ -10,7 +10,7 @@
  routes.delete('/auth/delete_account', UserController.delete);
  routes.post('/auth/first_acess', UserController.firstAcess);
  routes.post('/auth/forgot_password',UserController.forgotPassword);
- routes.post('/auth/recover_password',UserController.reset);
+ routes.post('/auth/recover_password',UserController.resetPassword);
  routes.post('/session/authenticate',SessionController.authenticateSession); 
 
  module.exports = routes;
