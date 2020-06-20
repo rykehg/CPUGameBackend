@@ -8,7 +8,7 @@
  // Routes
  routes.post('/auth/register', UserController.create);
  routes.delete('/auth/delete_account', UserController.delete);
- routes.post('/auth/first_acess', UserController.firstAcess);
+ routes.post('/auth/first_access', UserController.firstAccess);
  routes.post('/auth/forgot_password',UserController.forgotPassword);
  routes.post('/auth/recover_password',UserController.resetPassword);
  routes.post('/session/authenticate',SessionController.authenticateSession); 

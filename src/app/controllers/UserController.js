@@ -6,7 +6,7 @@ const mailer = require('../../../modules/mailer.js');
 
 module.exports = { 
 
-  async create(request, response) {
+  async create (request, response) {
     const { login, email, type, name } = request.body;
 
     try {
@@ -61,12 +61,11 @@ module.exports = {
     }
   },
 
-  async firstAcess (request, response) {
+  async firstAccess (request, response) {
     const { email, token, password } = request.body;
     
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     try {
+      const hashedPassword = await bcrypt.hash(password, 10);
       const user = await connection('users').where('nm_Email', email).first();
 
       if (user == null)
@@ -143,10 +142,9 @@ module.exports = {
 
   async resetPassword (request, response) {
     const { email, token, password } = request.body;
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
+      const hashedPassword = await bcrypt.hash(password, 10);
       const user = await connection('users').where('nm_Email', email).first();
 
       if (user == null)
@@ -169,7 +167,7 @@ module.exports = {
       response.send();
 
     } catch (err) {
-      response.status(400).json({ error: 'Cannot reset password, try again.' });
+      response.status(400).json({ err });//error: 'Cannot reset password, try again.' });
     }
   },
 
