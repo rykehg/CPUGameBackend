@@ -6,7 +6,8 @@ exports.up = function(knex) {
     table.string('nm_Login', 30);
     table.string('nm_Email', 40);
     table.string('nm_Type', 9);
-    table.string('nm_Password', 20);
+    table.string('nm_Password', 30);
+    table.string('cd_Token', 255);
     table.timestamp('dt_Register').defaultTo(knex.fn.now());
     table.timestamp('dt_Expire');
   });
