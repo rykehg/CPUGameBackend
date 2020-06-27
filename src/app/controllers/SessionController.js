@@ -2,7 +2,7 @@ const connection = require('../../database/connection');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const mailer = require('../../../modules/mailer.js');
+const authConfig = require('../../../config/auth.json');
 
 function generateToken(params = {}){
   return jwt.sign(params, authConfig.secret, {
@@ -35,7 +35,8 @@ module.exports = {
         token: generateToken({ id: user.nm_Email }),
       });
     } catch (err) {
-      return response.status(400).json({ error: 'Error during authentication. Try again!' });
+      console.log(err);
+      return response.status(400).json({ error: 'Error during authentication. Try again!' });      
     }
   }
   
