@@ -4,8 +4,7 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const mailer = require('../../../modules/mailer.js');
 
-module.exports = { 
-
+module.exports = {
   async create (request, response) {
     const { login, email, type, name } = request.body;
 
@@ -13,9 +12,7 @@ module.exports = {
       const userExists = await connection('users').where('nm_Email', email).first();
 
       if (userExists)
-        
-        return response.status(400).json({ error: 'User already exists.' });
-
+        return response.status(400).json({ error: 'E-mail já cadastrado.' });
 
       const token = crypto.randomBytes(20).toString('hex');
       const hashedToken = await bcrypt.hash(token, 10)
@@ -41,7 +38,7 @@ module.exports = {
         context: { token },
       }, (err) => {
         if (err)
-          return response.status(400).json({ error: 'Cannot send forgot password email.' });
+          return response.status(400).json({ error: 'Não foi possivel mandar e-mail de confirmação.' });
 
         return response.send();
 
@@ -57,7 +54,7 @@ module.exports = {
 
     } catch (error) {
       console.log(error);
-      return response.status(400).json({ error: 'Registration failed' });
+      return response.status(400).json({ error: 'O resgistro falhou.' });
     }
   },
 
@@ -69,13 +66,17 @@ module.exports = {
       const user = await connection('users').where('nm_Email', email).first();
 
       if (user == null)
-        return response.status(400).json('Cannot find user.');
+        return response.status(400).json('Não foi possivel encontrar o usuário.');
+
+      if(!(/^(?=.*[a-zA-Z])(?=.*[0-9])/).test(password))
+        return response.status(400).json({ error: 'A senha deve conter números e letras' });
 
       if (!await bcrypt.compare(token, user.cd_Token))
-        return response.status(400).json({ error: 'Token invalid' });
+        return response.status(400).json({ error: 'Token inválido.' });
+
 
       const now = new Date();
-
+      //If token has expired in firts access user data will be erased
       if (now > user.dt_Expire){
         await connection('users')
         .where('nm_Email', email)
@@ -86,7 +87,7 @@ module.exports = {
           nm_Type: null,
           cd_Token: null
         });
-        return response.status(400).json({ error: 'Token expired, register again.' });
+        return response.status(400).json({ error: 'Token expirou, por favor faça o cadastro novamente.' });
       }
       await connection('users').update({
         nm_Password: hashedPassword
@@ -94,7 +95,7 @@ module.exports = {
 
       response.send();
     } catch (err) {
-      response.status(400).json({ error: 'Cannot reset password, try again.' });
+      response.status(400).json({ error: 'Não foi possivel cadastrar a senha. Por favor tente novamente.' });
     }
   },
 
@@ -107,7 +108,7 @@ module.exports = {
         .first();
   
       if(!user)
-        return response.status(400).json({ error: 'User not found!' });
+        return response.status(400).json({ error: 'Usuário não encontrado.' });
   
       const token = crypto.randomBytes(20).toString('hex');
   
@@ -130,13 +131,13 @@ module.exports = {
         context: { token },
       }, (err) => {
         if(err)
-          return response.status(400).json({ error: 'Cannot send forgot password email.' });
+          return response.status(400).json({ error: 'Não foi possivel mandar o e-mail de recuperação de senha. Tente novamente.' });
       
         return response.send();  
       });
       return response.send();
     } catch (err) {
-      return response.status(400).json({ error: 'Error on forgot password. Please, try again!' });
+      return response.status(400).json({ error: 'Erro eu tentar recuperar a senha. Tente novamente.' });
     }
   },
 
@@ -148,18 +149,21 @@ module.exports = {
       const user = await connection('users').where('nm_Email', email).first();
 
       if (user == null)
-        return response.status(400).json('Cannot find user.');
+        return response.status(400).json('Usuário não encontrado.');
+        
+      if(!(/^(?=.*[a-zA-Z])(?=.*[0-9])/).test(password))
+        return response.status(400).json({ error: 'A senha deve conter números e letras' });
 
       if (!await bcrypt.compare(token, user.cd_Token))
-        return response.status(400).json({ error: 'Token invalid.' });
+        return response.status(400).json({ error: 'Token inválido.' });
 
       const now = new Date();
 
       if (now > user.dt_Expire)
-        return response.status(400).json({ error: 'Token expired, generate a new one.' });
+        return response.status(400).json({ error: 'Token expirou, por favor tente novamente.' });
 
       if (await bcrypt.compare(password, user.nm_Password))
-        return response.status(400).json({ error: 'Same Password!!' });
+        return response.status(400).json({ error: 'Senha já cadastrada.' });
 
       await connection('users').update({
         nm_Password: hashedPassword
@@ -167,7 +171,7 @@ module.exports = {
       response.send();
 
     } catch (err) {
-      response.status(400).json({ err });//error: 'Cannot reset password, try again.' });
+      response.status(400).json({ error: 'Não foi possivel cadastrar a senha. Tente novamente.' });
     }
   },
 
