@@ -165,9 +165,11 @@ module.exports = {
       if (await bcrypt.compare(password, user.nm_Password))
         return response.status(400).json({ error: 'Senha já cadastrada.' });
 
-      await connection('users').update({
-        nm_Password: hashedPassword
-      });
+      await connection('users')
+        .where('nm_Email', email)
+        .update({
+          nm_Password: hashedPassword
+        });
       response.send();
 
     } catch (err) {
